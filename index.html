@@ -336,7 +336,7 @@
     <h3>The rules</h3>
     <p>A cylindrical table has cup holders equally spaced around its edge. Each cup holds a coin — heads or tails — but the room is pitch dark. You can only feel the coins, not see them.</p>
     <p>Each move: reach into two cups simultaneously (adjacent or diagonal in the 4-cup game, any four in the 8-cup game), feel what's inside, then flip whichever coins you choose. Then the table spins by an unknown amount — you lose all sense of which cups you just touched.</p>
-    <p>Goal: get all coins to the same face — all heads or all tails — in as few moves as possible. The proven minimum for the 4-cup puzzle is <strong>5 moves</strong>.</p>
+    <p>Goal: get all coins to the same face — all heads or all tails — in as few moves as possible. Using the best strategy, the 4-cup puzzle should be solve in a maximum of <strong>5 moves</strong>.</p>
   </div>
 </header>
 
@@ -361,7 +361,7 @@
       <div class="panel-label">Stats</div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Moves</div><div class="stat-val" id="move-count">0</div></div>
-        <div class="stat-card"><div class="stat-label">Minimum</div><div class="stat-val" id="best-val">5</div></div>
+        <div class="stat-card"><div class="stat-label">Maximum</div><div class="stat-val" id="best-val">5</div></div>
       </div>
       <div class="panel-label">Log</div>
       <div class="log-wrap"><div id="log"></div></div>
@@ -374,7 +374,7 @@
   </div>
 </main>
 
-<footer>The Spinning Table Puzzle &mdash; can you beat it in the minimum number of moves?</footer>
+<footer>The Spinning Table Puzzle &mdash; can you solve the puzzle?</footer>
 
 <script>
 let MODE = 4, coins = [], selected = [], moveCount = 0;
