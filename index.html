@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Logic Puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #e8e6e0;
+    --text-muted: #7a7870;
+    --text-dim: #4a4845;
+    --accent: #c8a96e;
+    --accent-dim: rgba(200,169,110,0.12);
+    --green: #5a9e7a;
+    --green-dim: rgba(90,158,122,0.12);
+    --red: #b85c5c;
+    --blue: #5a7eb8;
+    --blue-dim: rgba(90,126,184,0.12);
+    --purple: #8b7ec8;
+    --purple-dim: rgba(139,126,200,0.15);
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(200,169,110,0.04) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(90,126,184,0.04) 0%, transparent 60%);
+  }
+
+  header {
+    text-align: center;
+    padding: 4rem 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 3rem;
+    background: linear-gradient(to bottom, transparent, var(--accent));
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    font-weight: 300;
+  }
+
+  .rules-toggle {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .rules-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  .rules-panel {
+    max-width: 640px;
+    margin: 1.5rem auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    display: none;
+    text-align: left;
+  }
+  .rules-panel.open { display: block; }
+  .rules-panel h3 { font-family: var(--font-display); font-size: 16px; color: var(--text); margin-bottom: 0.75rem; font-weight: 400; }
+  .rules-panel p { margin-bottom: 0.75rem; }
+  .rules-panel p:last-child { margin-bottom: 0; }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .mode-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .mode-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    font-weight: 500;
+    box-shadow: 0 0 0 1px var(--border2);
+  }
+
+  .game-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 560px) { .game-grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  .panel-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .table-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+
+  .cup { cursor: pointer; }
+  .cup .bg { transition: fill 0.15s; }
+  .cup:hover .bg { fill: #2a2a32; }
+  .cup .ring { fill: none; stroke-width: 2; transition: stroke 0.2s, stroke-width 0.2s; stroke: #2e2e38; }
+  .cup.sel1 .ring { stroke: var(--green); stroke-width: 2.5; }
+  .cup.sel2 .ring { stroke: var(--accent); stroke-width: 2.5; }
+  .cup.sel3 .ring { stroke: var(--blue); stroke-width: 2.5; }
+  .cup.sel4 .ring { stroke: var(--purple); stroke-width: 2.5; }
+  .cup-num { font-size: 9px; fill: var(--text-dim); dominant-baseline: middle; text-anchor: middle; font-family: 'DM Mono', monospace; }
+  .coin-glyph { font-size: 12px; font-weight: 500; dominant-baseline: middle; text-anchor: middle; font-family: 'DM Mono', monospace; fill: var(--text-muted); }
+  .coin-glyph.flipping { fill: var(--purple); }
+
+  .sel-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    min-height: 16px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .stat-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .stat-label { font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+  .stat-val { font-size: 22px; font-weight: 500; color: var(--text); font-family: var(--font-mono); }
+
+  .log-wrap { height: 140px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+  .log-entry { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); padding: 3px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+  .log-entry.good { color: var(--green); }
+  .log-entry.bad { color: var(--red); }
+  .log-entry.info { color: var(--blue); }
+
+  .action-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  .felt-display {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .felt-coin {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .felt-coin:hover { border-color: var(--border2); }
+  .felt-coin.marked { border-color: var(--purple); color: var(--purple); background: var(--purple-dim); }
+  .felt-coin .cup-id { font-size: 10px; color: var(--text-dim); }
+  .felt-coin.marked .cup-id { color: var(--purple); opacity: 0.7; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text-muted);
+  }
+  .btn:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .btn.primary:hover { background: rgba(200,169,110,0.2); }
+  .btn.danger { background: rgba(184,92,92,0.1); border-color: var(--red); color: var(--red); }
+  .btn.danger:hover { background: rgba(184,92,92,0.2); }
+
+  .banner {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: none;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+  .banner.win { display: block; background: var(--green-dim); border: 1px solid var(--green); color: var(--green); }
+  .banner.hint-info { display: block; background: var(--blue-dim); border: 1px solid var(--blue); color: var(--blue); font-size: 12px; }
+
+  .helper-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    line-height: 1.6;
+  }
+  .helper-note span { color: var(--green); }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Logic Puzzle</div>
+  <h1>The <em>Spinning</em> Table</h1>
+  <p class="subtitle">A dark room. A spinning table. Four coins. Can you align them all without seeing?</p>
+  <button class="rules-toggle" onclick="toggleRules()">▸ How to play</button>
+  <div class="rules-panel" id="rules">
+    <h3>The rules</h3>
+    <p>A cylindrical table has cup holders equally spaced around its edge. Each cup holds a coin — heads or tails — but the room is pitch dark. You can only feel the coins, not see them.</p>
+    <p>Each move: reach into two cups simultaneously (adjacent or diagonal in the 4-cup game, any four in the 8-cup game), feel what's inside, then flip whichever coins you choose. Then the table spins by an unknown amount — you lose all sense of which cups you just touched.</p>
+    <p>Goal: get all coins to the same face — all heads or all tails — in as few moves as possible. The theoretical minimum for the 4-cup puzzle is <strong>5 moves</strong>.</p>
+  </div>
+</header>
+
+<main>
+  <div class="mode-bar">
+    <button class="mode-btn active" id="btn4" onclick="setMode(4)">4 cups &mdash; solo</button>
+    <button class="mode-btn" id="btn8" onclick="setMode(8)">8 cups &mdash; with friend</button>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="game-grid">
+    <div class="panel">
+      <div class="panel-label">Table</div>
+      <div class="table-wrap">
+        <svg id="tablesvg" viewBox="-120 -120 240 240" width="210" height="210" style="overflow:visible;"></svg>
+      </div>
+      <div class="sel-hint" id="sel-hint">Click a cup to select</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">Stats</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Moves</div><div class="stat-val" id="move-count">0</div></div>
+        <div class="stat-card"><div class="stat-label">Minimum</div><div class="stat-val" id="best-val">4</div></div>
+      </div>
+      <div class="panel-label">Log</div>
+      <div class="log-wrap"><div id="log"></div></div>
+    </div>
+  </div>
+
+  <div class="action-panel">
+    <div class="panel-label">Actions</div>
+    <div id="action-content"></div>
+  </div>
+</main>
+
+<footer>The Spinning Table Puzzle &mdash; can you beat it in the minimum number of moves?</footer>
+
+<script>
+let MODE = 4, coins = [], selected = [], moveCount = 0;
+let phase = 'select', revealed = [], flipChoices = [];
+
+function toggleRules() {
+  const p = document.getElementById('rules');
+  const btn = document.querySelector('.rules-toggle');
+  p.classList.toggle('open');
+  btn.textContent = p.classList.contains('open') ? '▾ Hide rules' : '▸ How to play';
+}
+
+function setMode(n) {
+  MODE = n;
+  document.getElementById('btn4').classList.toggle('active', n===4);
+  document.getElementById('btn8').classList.toggle('active', n===8);
+  document.getElementById('best-val').textContent = n===4 ? '4' : '?';
+  reset();
+}
+
+function reset() {
+  coins = Array.from({length:MODE}, () => Math.random()<0.5?'H':'T');
+  selected=[]; moveCount=0; phase='select'; revealed=[]; flipChoices=[];
+  document.getElementById('move-count').textContent='0';
+  document.getElementById('banner').className='banner';
+  log('New game. Table randomised and spun.','info');
+  log('The room is dark — you cannot see the coins.','info');
+  renderTable(); renderActions(); updateHint();
+}
+
+function log(msg, cls='') {
+  const el=document.getElementById('log');
+  const d=document.createElement('div');
+  d.className='log-entry'+(cls?' '+cls:'');
+  d.textContent=msg;
+  el.prepend(d);
+}
+
+function getCupPos(i, total, r) {
+  const a=(2*Math.PI*i/total)-Math.PI/2;
+  return {x:r*Math.cos(a), y:r*Math.sin(a)};
+}
+
+function renderTable() {
+  const svg=document.getElementById('tablesvg');
+  const r=MODE===4?72:84, cr=MODE===4?26:18;
+  svg.innerHTML='';
+
+  const ns='http://www.w3.org/2000/svg';
+  const tbl=document.createElementNS(ns,'circle');
+  tbl.setAttribute('cx','0'); tbl.setAttribute('cy','0');
+  tbl.setAttribute('r', r+cr+6);
+  tbl.setAttribute('fill','#1a1a20');
+  tbl.setAttribute('stroke','#2a2a32');
+  tbl.setAttribute('stroke-width','1');
+  svg.appendChild(tbl);
+
+  for(let i=0;i<MODE;i++){
+    const pos=getCupPos(i,MODE,r);
+    const g=document.createElementNS(ns,'g');
+    g.setAttribute('transform',`translate(${pos.x},${pos.y})`);
+    g.setAttribute('class','cup');
+
+    const bg=document.createElementNS(ns,'circle');
+    bg.setAttribute('cx','0'); bg.setAttribute('cy','0'); bg.setAttribute('r',cr);
+    bg.setAttribute('fill','#1e1e26'); bg.setAttribute('class','bg');
+
+    const ring=document.createElementNS(ns,'circle');
+    ring.setAttribute('cx','0'); ring.setAttribute('cy','0'); ring.setAttribute('r',cr);
+    ring.setAttribute('class','ring');
+
+    const num=document.createElementNS(ns,'text');
+    num.setAttribute('class','cup-num');
+    num.setAttribute('y',-(cr+5)); num.textContent=i+1;
+
+    const coin=document.createElementNS(ns,'text');
+    coin.setAttribute('class','coin-glyph'+(flipChoices.includes(i)?' flipping':''));
+    coin.setAttribute('y','1');
+    coin.textContent=revealed.includes(i)?coins[i]:'·';
+
+    g.appendChild(bg); g.appendChild(ring); g.appendChild(num); g.appendChild(coin);
+
+    const sc=getSelClass(i);
+    if(sc) g.classList.add(sc);
+    g.addEventListener('click',()=>clickCup(i));
+    svg.appendChild(g);
+  }
+}
+
+function getSelClass(i){
+  const idx=selected.indexOf(i);
+  if(idx===0) return'sel1';
+  if(idx===1) return'sel2';
+  if(idx===2) return'sel3';
+  if(idx===3) return'sel4';
+  return'';
+}
+
+function isValidPair(a,b){
+  if(MODE!==4) return true;
+  const d=Math.abs(a-b);
+  return d===1||d===3||d===2;
+}
+
+function clickCup(i){
+  if(phase!=='select') return;
+  const max=MODE===4?2:4;
+  if(selected.includes(i)){
+    selected=selected.filter(x=>x!==i);
+  } else if(selected.length<max){
+    if(MODE===4&&selected.length===1&&!isValidPair(selected[0],i)){
+      log('Only adjacent or diagonal cups allowed in the 4-cup puzzle.','bad'); return;
+    }
+    selected.push(i);
+  }
+  renderTable(); updateHint(); renderActions();
+}
+
+function updateHint(){
+  const el=document.getElementById('sel-hint');
+  const max=MODE===4?2:4;
+  if(phase==='select'){
+    if(selected.length===0) el.textContent=MODE===4?'Select your first cup':'Select 4 cups total';
+    else if(selected.length<max) el.textContent=`Select ${max-selected.length} more cup(s)`;
+    else el.textContent='Ready — reach in below';
+  } else if(phase==='flip'){
+    el.textContent='Click coins to mark for flipping';
+  } else { el.textContent=''; }
+}
+
+function renderActions(){
+  const el=document.getElementById('action-content');
+  const max=MODE===4?2:4;
+
+  if(phase==='select'){
+    el.innerHTML=`
+      <div class="btn-row">
+        <button class="btn primary" onclick="reachIn()" ${selected.length<max?'disabled':''}>Reach in &amp; feel the coins</button>
+        <button class="btn danger" onclick="reset()">New game</button>
+      </div>
+      ${MODE===8?'<div class="helper-note"><span>Friend mode:</span> You cover cups 1&amp;2 of your selection; your friend covers cups 3&amp;4. Talk freely before confirming.</div>':''}
+    `;
+  } else if(phase==='flip'){
+    const feltHTML=revealed.map(i=>`
+      <div class="felt-coin ${flipChoices.includes(i)?'marked':''}" onclick="toggleFlip(${i})">
+        <span class="cup-id">cup ${i+1}</span>
+        <strong>${coins[i]}</strong>
+        ${flipChoices.includes(i)?'<span style="font-size:10px;">↩ flip</span>':''}
+      </div>
+    `).join('');
+    el.innerHTML=`
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-family:var(--font-mono);">You feel — click to mark for flipping:</div>
+      <div class="felt-display">${feltHTML}</div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="confirmMove()">Confirm &amp; spin table</button>
+        <button class="btn" onclick="cancelReach()">Cancel</button>
+      </div>
+    `;
+  }
+}
+
+function reachIn(){
+  const max=MODE===4?2:4;
+  if(selected.length!==max) return;
+  phase='flip'; revealed=[...selected]; flipChoices=[];
+  renderTable(); renderActions(); updateHint();
+  log(`Reached into cup(s) ${selected.map(x=>x+1).join(', ')} — felt: ${selected.map(i=>coins[i]).join(', ')}`);
+}
+
+function toggleFlip(i){
+  flipChoices=flipChoices.includes(i)?flipChoices.filter(x=>x!==i):[...flipChoices,i];
+  renderTable(); renderActions();
+}
+
+function cancelReach(){
+  phase='select'; revealed=[]; flipChoices=[];
+  renderTable(); renderActions(); updateHint();
+}
+
+function confirmMove(){
+  flipChoices.forEach(i=>{coins[i]=coins[i]==='H'?'T':'H';});
+  moveCount++;
+  document.getElementById('move-count').textContent=moveCount;
+  const fs=flipChoices.length?`Flipped cup(s) ${flipChoices.map(x=>x+1).join(', ')}`:'No coins flipped';
+  log(`Move ${moveCount}: ${fs}`);
+
+  if(coins.every(c=>c==='H')||coins.every(c=>c==='T')){
+    const v=coins[0];
+    log(`Solved in ${moveCount} move(s) — all ${v}!`,'good');
+    const b=document.getElementById('banner');
+    b.className='banner win';
+    b.textContent=`Puzzle solved in ${moveCount} move${moveCount===1?'':'s'}! All coins show ${v}.`;
+    phase='done';
+    revealed=Array.from({length:MODE},(_,i)=>i);
+    flipChoices=[];
+    renderTable();
+    document.getElementById('action-content').innerHTML=`<div class="btn-row"><button class="btn primary" onclick="reset()">Play again</button></div>`;
+    document.getElementById('sel-hint').textContent='';
+    return;
+  }
+  spinTable();
+}
+
+function spinTable(){
+  const rot=Math.floor(Math.random()*MODE);
+  const nc=Array(MODE);
+  for(let i=0;i<MODE;i++) nc[(i+rot)%MODE]=coins[i];
+  coins=nc; selected=[]; revealed=[]; flipChoices=[]; phase='select';
+  log('Table spun — cup positions unknown.','info');
+  renderTable(); renderActions(); updateHint();
+}
+
+reset();
+</script>
+</body>
+</html>
