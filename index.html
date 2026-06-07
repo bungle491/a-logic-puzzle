@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Logic Puzzle</title>
+<title>The Spinning Table Puzzle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -11,23 +11,23 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0d0d0f;
-    --surface: #16161a;
-    --surface2: #1e1e24;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.15);
-    --text: #e8e6e0;
-    --text-muted: #7a7870;
-    --text-dim: #4a4845;
-    --accent: #c8a96e;
-    --accent-dim: rgba(200,169,110,0.12);
-    --green: #5a9e7a;
-    --green-dim: rgba(90,158,122,0.12);
-    --red: #b85c5c;
-    --blue: #5a7eb8;
-    --blue-dim: rgba(90,126,184,0.12);
-    --purple: #8b7ec8;
-    --purple-dim: rgba(139,126,200,0.15);
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.15);
+    --text: #1a1916;
+    --text-muted: #6b6860;
+    --text-dim: #a8a59e;
+    --accent: #9a6f2e;
+    --accent-dim: rgba(154,111,46,0.10);
+    --green: #2d7a52;
+    --green-dim: rgba(45,122,82,0.10);
+    --red: #a03030;
+    --blue: #2d5a9a;
+    --blue-dim: rgba(45,90,154,0.10);
+    --purple: #5a4aaa;
+    --purple-dim: rgba(90,74,170,0.12);
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'DM Sans', sans-serif;
     --font-mono: 'DM Mono', monospace;
@@ -44,8 +44,8 @@
     font-weight: 300;
     line-height: 1.6;
     min-height: 100vh;
-    background-image: radial-gradient(ellipse at 20% 0%, rgba(200,169,110,0.04) 0%, transparent 60%),
-                      radial-gradient(ellipse at 80% 100%, rgba(90,126,184,0.04) 0%, transparent 60%);
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(154,111,46,0.06) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(45,90,154,0.05) 0%, transparent 60%);
   }
 
   header {
@@ -198,8 +198,8 @@
 
   .cup { cursor: pointer; }
   .cup .bg { transition: fill 0.15s; }
-  .cup:hover .bg { fill: #2a2a32; }
-  .cup .ring { fill: none; stroke-width: 2; transition: stroke 0.2s, stroke-width 0.2s; stroke: #2e2e38; }
+  .cup:hover .bg { fill: #e8e4dc; }
+  .cup .ring { fill: none; stroke-width: 2; transition: stroke 0.2s, stroke-width 0.2s; stroke: #d0ccc4; }
   .cup.sel1 .ring { stroke: var(--green); stroke-width: 2.5; }
   .cup.sel2 .ring { stroke: var(--accent); stroke-width: 2.5; }
   .cup.sel3 .ring { stroke: var(--blue); stroke-width: 2.5; }
@@ -336,7 +336,7 @@
     <h3>The rules</h3>
     <p>A cylindrical table has cup holders equally spaced around its edge. Each cup holds a coin — heads or tails — but the room is pitch dark. You can only feel the coins, not see them.</p>
     <p>Each move: reach into two cups simultaneously (adjacent or diagonal in the 4-cup game, any four in the 8-cup game), feel what's inside, then flip whichever coins you choose. Then the table spins by an unknown amount — you lose all sense of which cups you just touched.</p>
-    <p>Goal: get all coins to the same face — all heads or all tails — in as few moves as possible. The theoretical minimum for the 4-cup puzzle is <strong>5 moves</strong>.</p>
+    <p>Goal: get all coins to the same face — all heads or all tails — in as few moves as possible. The proven minimum for the 4-cup puzzle is <strong>5 moves</strong>.</p>
   </div>
 </header>
 
@@ -361,7 +361,7 @@
       <div class="panel-label">Stats</div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Moves</div><div class="stat-val" id="move-count">0</div></div>
-        <div class="stat-card"><div class="stat-label">Minimum</div><div class="stat-val" id="best-val">4</div></div>
+        <div class="stat-card"><div class="stat-label">Minimum</div><div class="stat-val" id="best-val">5</div></div>
       </div>
       <div class="panel-label">Log</div>
       <div class="log-wrap"><div id="log"></div></div>
@@ -391,7 +391,7 @@ function setMode(n) {
   MODE = n;
   document.getElementById('btn4').classList.toggle('active', n===4);
   document.getElementById('btn8').classList.toggle('active', n===8);
-  document.getElementById('best-val').textContent = n===4 ? '4' : '?';
+  document.getElementById('best-val').textContent = n===4 ? '5' : '?';
   reset();
 }
 
@@ -427,8 +427,8 @@ function renderTable() {
   const tbl=document.createElementNS(ns,'circle');
   tbl.setAttribute('cx','0'); tbl.setAttribute('cy','0');
   tbl.setAttribute('r', r+cr+6);
-  tbl.setAttribute('fill','#1a1a20');
-  tbl.setAttribute('stroke','#2a2a32');
+  tbl.setAttribute('fill','#e8e4dc');
+  tbl.setAttribute('stroke','#d0ccc4');
   tbl.setAttribute('stroke-width','1');
   svg.appendChild(tbl);
 
@@ -440,7 +440,7 @@ function renderTable() {
 
     const bg=document.createElementNS(ns,'circle');
     bg.setAttribute('cx','0'); bg.setAttribute('cy','0'); bg.setAttribute('r',cr);
-    bg.setAttribute('fill','#1e1e26'); bg.setAttribute('class','bg');
+    bg.setAttribute('fill','#f5f2ed'); bg.setAttribute('class','bg');
 
     const ring=document.createElementNS(ns,'circle');
     ring.setAttribute('cx','0'); ring.setAttribute('cy','0'); ring.setAttribute('r',cr);
